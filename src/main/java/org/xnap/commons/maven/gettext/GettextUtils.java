@@ -1,12 +1,12 @@
 /**
  * Copyright 2006 Felix Berger
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,21 +20,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-// TODO this is a copy from the gettext-ant-tasks. Ideally, both projects
-// should use a common library
+// TODO: Use commons-lang3 method for this?
 public class GettextUtils {
 
     public static String getJavaLocale(String locale) {
         if (locale == null) {
             throw new IllegalArgumentException();
         }
-        
+
         List tokens = new ArrayList(3);
         StringTokenizer t = new StringTokenizer(locale, "_");
         while (t.hasMoreTokens()) {
             tokens.add(t.nextToken());
         }
-        
+
         if (tokens.size() < 1 || tokens.size() > 3) {
             throw new IllegalArgumentException("Invalid locale format: " + locale);
         }
@@ -57,22 +56,22 @@ public class GettextUtils {
         // Locale.java replaces these codes, so we have to do it too
         String language = (String) tokens.get(0);
         if (language.equalsIgnoreCase("he")) {
-        	tokens.set(0, "iw");
+            tokens.set(0, "iw");
         } else if (language.equalsIgnoreCase("yi")) {
-        	tokens.set(0, "ji");
+            tokens.set(0, "ji");
         } else if (language.equalsIgnoreCase("id")) {
-        	tokens.set(0, "in");
+            tokens.set(0, "in");
         }
 
         StringBuffer sb = new StringBuffer();
-        for (Iterator it = tokens.iterator(); it.hasNext();) {
+        for (Iterator it = tokens.iterator(); it.hasNext(); ) {
             String token = (String) it.next();
             sb.append(token);
             if (it.hasNext()) {
                 sb.append("_");
             }
         }
-        
+
         return sb.toString();
     }
 

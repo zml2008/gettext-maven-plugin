@@ -34,27 +34,18 @@ Usage
  Update pot and po files: 
 
 -------------------
-mvn org.xnap.commons:maven-gettext-plugin:merge
+mvn ninja.leaping:maven-gettext-plugin:merge
 -------------------
 
  Create properties/classs files: 
 
 -------------------
-mvn org.xnap.commons:maven-gettext-plugin:1.0:dist
+mvn ninja.leaping:maven-gettext-plugin:1.0:dist
 -------------------
 
 *How to Generate the Gettext Report
  
 -------------------
-  <pluginRepositories>
-    <pluginRepository>
-      <id>xnap-commons</id>
-      <name>XNap Commons Repository</name>
-      <url>http://xnap-commons.sourceforge.net/repository</url>
-    </pluginRepository>
-  </pluginRepositories>
-
-...
 
   <reporting>
     <plugins>

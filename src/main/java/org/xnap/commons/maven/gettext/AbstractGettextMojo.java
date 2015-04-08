@@ -19,40 +19,34 @@ package org.xnap.commons.maven.gettext;
 import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- *
- */
-public abstract class AbstractGettextMojo
-    extends AbstractMojo {
-	
-	
-	/**
+public abstract class AbstractGettextMojo extends AbstractMojo {
+
+
+    /**
      * The output directory for generated class or properties files.
-     * @parameter expression="${outputDirectory}" default-value="${project.build.outputDirectory}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
     protected File outputDirectory;
 
     /**
      * Source directory. This directory is searched recursively for .java files.
-     * @parameter expression="${sourceDirectory}" default-value="${project.build.sourceDirectory}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.sourceDirectory}", required = true)
     protected File sourceDirectory;
     
     /**
      * The output directory for the keys.pot directory for merging .po files. 
-     * @parameter expression="${poDirectory}" default-value="${project.build.sourceDirectory}/main/po"
-     * @required
      */
+    @Parameter(defaultValue = "src/main/po", required = true)
     protected File poDirectory;
     
     /**
      * Filename of the .pot file.
-     * @parameter expression="${keysFile}" default-value="keys.pot"
-     * @required
      */
+    @Parameter(defaultValue = "keys.pot", required = true)
     protected String keysFile;
     
 }
