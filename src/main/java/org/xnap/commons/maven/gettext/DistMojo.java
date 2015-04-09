@@ -19,6 +19,7 @@ package org.xnap.commons.maven.gettext;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -163,7 +164,7 @@ public class DistMojo extends AbstractGettextMojo {
 
         private String getLocale(File file) {
             String locale = file.getName().substring(0, file.getName().lastIndexOf('.'));
-            return GettextUtils.getJavaLocale(locale);
+            return LocaleUtils.toLocale(locale).toString();
         }
 
         public Commandline createCommandline(File file) {
@@ -193,7 +194,7 @@ public class DistMojo extends AbstractGettextMojo {
         public File getOutputFile(File input) {
             String basepath = targetBundle.replace('.', File.separatorChar);
             String locale = input.getName().substring(0, input.getName().lastIndexOf('.'));
-            locale = GettextUtils.getJavaLocale(locale);
+            locale = LocaleUtils.toLocale(locale).toString();
             File target = new File(outputDirectory, basepath + "_" + locale + ".properties");
             return target;
         }
