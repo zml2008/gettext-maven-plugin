@@ -89,8 +89,8 @@ public class GettextMojo extends AbstractGettextMojo {
         cl.createArg().setValue("--from-code=" + encoding);
         cl.createArg().setValue("--output=" + new File(poDirectory, keysFile).getAbsolutePath());
         cl.createArg().setValue("--language=Java");
-        //cl.createArg().setValue("--sort-output");
-        cl.createArg().setValue("--join-existing");
+        cl.createArg().setValue("--sort-output");
+        //cl.createArg().setValue("--join-existing");
         cl.createArg().setLine(keywords);
         cl.setWorkingDirectory(sourceDirectory.getAbsolutePath());
 
