@@ -19,13 +19,9 @@ under the License.
 -->
 <project>
   <bannerLeft>
-    <src>http://sourceforge.net/sflogo.php?group_id=121150&amp;type=1</src>
-    <href>http://sourceforge.net</href>
-  </bannerLeft>
-  <bannerRight>
     <name>Maven Gettext Plugin</name>
-    <href>http://code.google.com/p/gettext-commons/</href>
-  </bannerRight>
+    <href>https://github.com/${gitUrl}/</href>
+  </bannerLeft>
   <body>
     <menu name="Overview">
       <item name="Usage" href="usage.html"/>

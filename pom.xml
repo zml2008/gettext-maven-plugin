@@ -5,24 +5,32 @@
   <packaging>maven-plugin</packaging>
   <version>1.2.5-SNAPSHOT</version>
   <name>Maven Gettext Plugin</name>
-  <url>http://gettext-commons.googlecode.com/svn/maven2-plugins-site/index.html</url>
+  <url>http://zml2008.github.io/gettext-maven-plugin/</url>
   <description>Generate messages templates and deploy messages bundles</description>
+  <properties>
+    <gitUrl>zml2008/gettext-maven-plugin</gitUrl>
+  </properties>
   <licenses>
     <license>
-      <name>GNU Library or Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <name>The Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
+  <inceptionYear>2005</inceptionYear>
   <developers>
+    <developer>
+      <id>zml</id>
+      <name>zml</name>
+    </developer>
     <developer>
       <id>vanto</id>
       <name>Tammo van Lessen</name>
       <url>http://www.taval.de</url>
       <organization>XNap Commons Team</organization>
       <roles>
-        <role>Project Manager</role>
-        <role>Developer</role>
-        <role>Creator</role>
+        <role>Former Project Manager</role>
+        <role>Former Developer</role>
+        <role>Former Creator</role>
       </roles>
     </developer>
     <developer>
@@ -31,7 +39,7 @@
       <url>http://steffenpingel.de</url>
       <organization>Gettext Commons Team</organization>
       <roles>
-        <role>Developer</role>
+        <role>Former Developer</role>
       </roles>
     </developer>
     <developer>
@@ -40,16 +48,30 @@
       <url>http://github.com/fberger/</url>
       <organization>Gettext Commons Team</organization>
       <roles>
-        <role>Developer</role>
-        <role>Maintainer</role>
+        <role>Former Developer</role>
+        <role>Former Maintainer</role>
       </roles>
     </developer>
   </developers>
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>9</version>
-  </parent>
+
+  <scm>
+    <connection>scm:git:https://github.com/${gitUrl}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitUrl}.git</developerConnection>
+    <url>https://github.com/${gitUrl}</url>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>gh-pages</id>
+      <name>GitHub Pages</name>
+      <url>git:ssh://git@github.com/${gitUrl}.git?gh-pages#</url>
+    </site>
+  </distributionManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -85,24 +107,26 @@
       <version>2.3</version>
     </dependency>
   </dependencies>
-  <scm>
-    <connection>scm:git:https://github.com/zml2008/gettext-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com/zml2008/gettext-maven-plugin.git</developerConnection>
-    <url>https://github.com/zml2008/gettext-maven-plugin</url>
-  </scm>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.14</version>
-      </plugin>
-      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.3</version>
+        <dependencies>
+          <dependency>
+            <groupId>net.trajano.wagon</groupId>
+            <artifactId>wagon-git</artifactId>
+            <version>2.0.2</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
@@ -127,4 +151,64 @@
       </plugin>
     </plugins>
   </reporting>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.5</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
