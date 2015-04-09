@@ -59,6 +59,7 @@ public class MergeMojo extends AbstractGettextMojo {
             cl.setExecutable(msgmergeCmd);
             cl.createArg().setValue("-q");
             cl.createArg().setValue("-U");
+            cl.createArg().setValue("--backup=none");
             cl.createArg().setFile(new File(poDirectory, files[i]));
             cl.createArg().setValue(new File(poDirectory, keysFile).getAbsolutePath());
 
