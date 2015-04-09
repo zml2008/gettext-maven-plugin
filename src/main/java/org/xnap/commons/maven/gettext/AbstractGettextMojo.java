@@ -28,7 +28,7 @@ public abstract class AbstractGettextMojo extends AbstractMojo {
     /**
      * The output directory for generated class or properties files.
      */
-    @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
+    @Parameter(defaultValue = "${project.build.directory}/generated-sources/gettext", required = true)
     protected File outputDirectory;
 
     /**
@@ -40,7 +40,7 @@ public abstract class AbstractGettextMojo extends AbstractMojo {
     /**
      * The output directory for the keys.pot directory for merging .po files. 
      */
-    @Parameter(defaultValue = "src/main/po", required = true)
+    @Parameter(defaultValue = "${basedir}/src/main/po", required = true)
     protected File poDirectory;
     
     /**

@@ -23,6 +23,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -73,12 +74,15 @@ public class DistMojo extends AbstractGettextMojo {
     @Parameter(defaultValue = "en", required = true)
     protected String sourceLocale;
 
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
+    protected MavenProject project;
+
     public void execute() throws MojoExecutionException {
 
         // create output directory if it doesn't exists
         outputDirectory.mkdirs();
 
-        CommandlineFactory cf = null;
+        CommandlineFactory cf;
         if ("class".equals(outputFormat)) {
             cf = new MsgFmtCommandlineFactory();
         } else if ("properties".equals(outputFormat)) {
@@ -121,6 +125,7 @@ public class DistMojo extends AbstractGettextMojo {
         touch(new File(outputDirectory, basepath + "_" + sourceLocale + ".properties"));
         getLog().info("Creating default resource bundle");
         touch(new File(outputDirectory, basepath + ".properties"));
+        project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
     }
 
     private boolean isNewer(File inputFile, File outputFile) {
@@ -177,6 +182,7 @@ public class DistMojo extends AbstractGettextMojo {
             cl.createArg().setValue(targetBundle);
             cl.createArg().setValue("-l");
             cl.createArg().setValue(getLocale(file));
+            cl.createArg().setValue("--source");
             cl.createArg().setFile(file);
             getLog().warn(cl.toString());
             return cl;
