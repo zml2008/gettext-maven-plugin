@@ -58,7 +58,6 @@ public class MergeMojo extends AbstractGettextMojo {
             Commandline cl = new Commandline();
             cl.setExecutable(msgmergeCmd);
             cl.createArg().setValue("-q");
-            cl.createArg().setValue("--backup=numbered");
             cl.createArg().setValue("-U");
             cl.createArg().setFile(new File(poDirectory, files[i]));
             cl.createArg().setValue(new File(poDirectory, keysFile).getAbsolutePath());
