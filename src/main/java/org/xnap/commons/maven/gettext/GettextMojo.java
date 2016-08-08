@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.FileSet;
@@ -80,16 +79,26 @@ public class GettextMojo extends AbstractGettextMojo {
     @Parameter
     protected FileSet extraSourceFiles;
 
+    @Parameter(defaultValue = "false")
+    protected boolean omitHeader;
+
     public void execute() throws MojoExecutionException {
         getLog().info("Invoking xgettext for Java files in '"
                 + sourceDirectory.getAbsolutePath() + "'.");
 
         Commandline cl = new Commandline();
         cl.setExecutable(xgettextCmd);
+        addExtraArguments(cl);
         cl.createArg().setValue("--from-code=" + encoding);
         cl.createArg().setValue("--output=" + new File(poDirectory, keysFile).getAbsolutePath());
         cl.createArg().setValue("--language=Java");
         cl.createArg().setValue("--sort-output");
+        if (omitHeader) {
+            cl.createArg().setValue("--omit-header");
+        }
+        if (omitLocation) {
+            cl.createArg().setValue("--no-location");
+        }
         //cl.createArg().setValue("--join-existing");
         cl.createArg().setLine(keywords);
         cl.setWorkingDirectory(sourceDirectory.getAbsolutePath());

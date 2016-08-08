@@ -44,6 +44,19 @@ public class MergeMojo extends AbstractGettextMojo {
     @Parameter(defaultValue = "msgmerge")
     protected String msgmergeCmd;
 
+    /**
+     * The --backup option.
+     * One of: 'none', 'numbered', 'existing', 'simple'
+     */
+    @Parameter(defaultValue = "none")
+    protected String backup;
+
+    /**
+     * Activates fuzzy matching if set to true.
+     */
+    @Parameter(defaultValue = "false")
+    protected boolean fuzzy;
+
     public void execute() throws MojoExecutionException {
         getLog().info("Invoking msgmerge for po files in '"
                 + poDirectory.getAbsolutePath() + "'.");
@@ -57,9 +70,16 @@ public class MergeMojo extends AbstractGettextMojo {
             getLog().info("Processing " + files[i]);
             Commandline cl = new Commandline();
             cl.setExecutable(msgmergeCmd);
+            addExtraArguments(cl);
             cl.createArg().setValue("-q");
             cl.createArg().setValue("-U");
-            cl.createArg().setValue("--backup=none");
+            cl.createArg().setValue("--backup=" + backup);
+            if (fuzzy) {
+                cl.createArg().setValue("--previous");
+            }
+            if (omitLocation) {
+                cl.createArg().setValue("--no-location");
+            }
             cl.createArg().setFile(new File(poDirectory, files[i]));
             cl.createArg().setValue(new File(poDirectory, keysFile).getAbsolutePath());
 

@@ -16,11 +16,11 @@ package org.xnap.commons.maven.gettext;
  * limitations under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.cli.Commandline;
+
+import java.io.File;
 
 public abstract class AbstractGettextMojo extends AbstractMojo {
 
@@ -48,5 +48,24 @@ public abstract class AbstractGettextMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "keys.pot", required = true)
     protected String keysFile;
-    
+
+    /**
+     * Optional raw command line arguments
+     */
+    @Parameter
+    protected String[] extraArguments;
+
+    /**
+     * Deactivates code omitLocation information if set to true.
+     */
+    @Parameter(defaultValue = "false")
+    protected boolean omitLocation;
+
+    protected void addExtraArguments(Commandline cl) {
+        if (extraArguments != null) {
+            for (String argument : extraArguments) {
+                cl.createArg().setValue(argument);
+            }
+        }
+    }
 }

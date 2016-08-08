@@ -3,7 +3,7 @@
   <groupId>ninja.leaping</groupId>
   <artifactId>gettext-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.2.5-SNAPSHOT</version>
+  <version>1.2.6-SNAPSHOT</version>
   <name>Maven Gettext Plugin</name>
   <url>http://zml2008.github.io/gettext-maven-plugin/</url>
   <description>Generate messages templates and deploy messages bundles</description>
