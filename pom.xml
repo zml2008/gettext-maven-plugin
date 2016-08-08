@@ -1,14 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ninja.leaping</groupId>
+  <groupId>com.signavio</groupId>
   <artifactId>gettext-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.2.6-SNAPSHOT</version>
+  <version>1.2.6</version>
   <name>Maven Gettext Plugin</name>
-  <url>http://zml2008.github.io/gettext-maven-plugin/</url>
   <description>Generate messages templates and deploy messages bundles</description>
   <properties>
-    <gitUrl>zml2008/gettext-maven-plugin</gitUrl>
+    <gitUrl>effektif/gettext-maven-plugin</gitUrl>
   </properties>
   <licenses>
     <license>
@@ -62,9 +61,15 @@
 
   <distributionManagement>
     <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>signavio-plugins-snapshots</id>
+      <name>signavio-snapshots</name>
+      <url>https://signavio.artifactoryonline.com/signavio/plugins-snapshot-local</url>
     </snapshotRepository>
+    <repository>
+      <id>signavio-plugins-releases</id>
+      <name>signavio-releases</name>
+      <url>https://signavio.artifactoryonline.com/signavio/plugins-release-local</url>
+    </repository>
     <site>
       <id>gh-pages</id>
       <name>GitHub Pages</name>
@@ -181,6 +186,9 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -196,17 +204,17 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.5</version>
-            <extensions>true</extensions>
-            <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
-          </plugin>
+          <!--<plugin>-->
+            <!--<groupId>org.sonatype.plugins</groupId>-->
+            <!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
+            <!--<version>1.6.5</version>-->
+            <!--<extensions>true</extensions>-->
+            <!--<configuration>-->
+              <!--<serverId>ossrh</serverId>-->
+              <!--<nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
+              <!--<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+            <!--</configuration>-->
+          <!--</plugin>-->
         </plugins>
       </build>
     </profile>
