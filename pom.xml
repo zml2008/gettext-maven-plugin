@@ -3,7 +3,7 @@
   <groupId>com.signavio</groupId>
   <artifactId>gettext-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.2.6</version>
+  <version>1.2.7-SNAPSHOT</version>
   <name>Maven Gettext Plugin</name>
   <description>Generate messages templates and deploy messages bundles</description>
   <properties>
