@@ -78,6 +78,12 @@ public class DistMojo extends AbstractGettextMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project;
 
+    /**
+     * Outputs the result as .java files and not classes if set to true.
+     */
+    @Parameter(defaultValue = "false")
+    protected boolean asSource;
+
     public void execute() throws MojoExecutionException {
 
         // create output directory if it doesn't exists
@@ -111,6 +117,7 @@ public class DistMojo extends AbstractGettextMojo {
             }
 
             Commandline cl = cf.createCommandline(inputFile);
+            this.addExtraArguments(cl);
             getLog().debug("Executing: " + cl.toString());
             StreamConsumer out = new LoggerStreamConsumer(getLog(), LoggerStreamConsumer.INFO);
             StreamConsumer err = new LoggerStreamConsumer(getLog(), LoggerStreamConsumer.WARN);
@@ -183,7 +190,9 @@ public class DistMojo extends AbstractGettextMojo {
             cl.createArg().setValue(targetBundle);
             cl.createArg().setValue("-l");
             cl.createArg().setValue(getLocale(file));
-            cl.createArg().setValue("--source");
+            if (asSource) {
+                cl.createArg().setValue("--source");
+            }
             cl.createArg().setFile(file);
             getLog().warn(cl.toString());
             return cl;

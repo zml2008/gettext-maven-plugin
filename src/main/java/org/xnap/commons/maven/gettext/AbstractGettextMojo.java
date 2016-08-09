@@ -28,7 +28,7 @@ public abstract class AbstractGettextMojo extends AbstractMojo {
     /**
      * The output directory for generated class or properties files.
      */
-    @Parameter(defaultValue = "${project.build.directory}/generated-sources/gettext", required = true)
+    @Parameter(defaultValue = "${project.build.outputDirectory}", required = true)
     protected File outputDirectory;
 
     /**
