@@ -18,18 +18,15 @@ package org.xnap.commons.maven.gettext;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
+import org.codehaus.plexus.util.cli.*;
 
 /**
  * Generates ressource bundles.
@@ -38,6 +35,16 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  */
 @Mojo(name = "dist", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class DistMojo extends AbstractGettextMojo {
+
+    private static Path TMP_DIR;
+
+    public DistMojo() {
+        try {
+            TMP_DIR = Files.createTempDirectory("gettext-maven");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * The msgcat command.
@@ -85,8 +92,12 @@ public class DistMojo extends AbstractGettextMojo {
     protected boolean asSource;
 
     public void execute() throws MojoExecutionException {
-
         // create output directory if it doesn't exists
+        try {
+            FileUtils.deleteDirectory(outputDirectory);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         outputDirectory.mkdirs();
 
         CommandlineFactory cf;
@@ -96,12 +107,12 @@ public class DistMojo extends AbstractGettextMojo {
             cf = new MsgCatCommandlineFactory();
         } else {
             throw new MojoExecutionException("Unknown output format: "
-                    + outputFormat + ". Should be 'class' or 'properties'.");
+                + outputFormat + ". Should be 'class' or 'properties'.");
         }
 
         DirectoryScanner ds = new DirectoryScanner();
         ds.setBasedir(poDirectory);
-        ds.setIncludes(new String[]{"**/*.po"});
+        ds.setIncludes(new String[] { "**/*.po" });
         ds.scan();
 
         String[] files = ds.getIncludedFiles();
@@ -117,8 +128,9 @@ public class DistMojo extends AbstractGettextMojo {
             }
 
             Commandline cl = cf.createCommandline(inputFile);
+
             this.addExtraArguments(cl);
-            getLog().debug("Executing: " + cl.toString());
+            getLog().debug("Executing: " + cl);
             StreamConsumer out = new LoggerStreamConsumer(getLog(), LoggerStreamConsumer.INFO);
             StreamConsumer err = new LoggerStreamConsumer(getLog(), LoggerStreamConsumer.WARN);
             try {
@@ -126,7 +138,59 @@ public class DistMojo extends AbstractGettextMojo {
             } catch (CommandLineException e) {
                 getLog().error("Could not execute " + cl.getExecutable() + ".", e);
             }
+
+            final String javaClassName = cf.getOutputFile(inputFile).getName().replace(".class", ".java");
+            final File bundleDir = Paths.get(TMP_DIR.toString(), "com", "signavio", "workflow", "i18n", javaClassName).toFile();
+            final Path outPath = Paths.get(outputDirectory.getAbsolutePath(), "com", "signavio", "workflow", "i18n");
+            try {
+
+                FileUtils.moveFileToDirectory(bundleDir, outPath.toFile(), outputDirectory.listFiles().length == 0);
+                //                FileUtils.
+
+            } catch (IOException e) {
+                throw new MojoExecutionException(
+                    "Unable to move dir '" + bundleDir + "' to '" + outputDirectory.toPath() + "'", e);
+            }
+
+            try {
+                FileUtils.cleanDirectory(TMP_DIR.toFile());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
+
+ /*       final String replace = targetBundle.replace('.', File.separatorChar);
+        Paths.get(outputDirectory.getAbsolutePath(), replace).toFile().mkdirs();
+                getLog().info(String.join("#", replace));
+
+        for (File dir : TMP_DIR.toFile().listFiles((FileFilter) DirectoryFileFilter.DIRECTORY)) {
+            getLog().info(dir.getAbsolutePath());
+
+            for (File file : dir.listFiles()) {
+                getLog().info(file.getAbsolutePath());
+                for (String f : file.list()) {
+                    getLog().info(f);
+                }
+            }
+
+            //            getLog().info(dir.listFiles() + "");
+            final File src = dir.listFiles()[0];
+            getLog().info(
+                "Moving dir " + src + " to " + outputDirectory.toPath());
+            try {
+//                Files.move(dir.toPath(), outputDirectory.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                getLog().info("source: " + src.getAbsolutePath());
+                FileUtils.moveToDirectory(src, outputDirectory, true);
+            } catch (IOException e) {
+                throw new MojoExecutionException(
+                    "Unable to move dir " + dir.toPath() + " to " + outputDirectory.toPath(), e);
+            }
+
+            //            dir.listFiles()[0]
+            //            final File target = new File(outputDirectory, dir.getAbsolutePath());
+            //            dir.renameTo(new File(outputDirectory, targetBundle));
+        }*/
 
         String basepath = targetBundle.replace('.', File.separatorChar);
         getLog().info("Creating resource bundle for source locale");
@@ -155,6 +219,7 @@ public class DistMojo extends AbstractGettextMojo {
     }
 
     private interface CommandlineFactory {
+
         Commandline createCommandline(File file);
 
         /**
@@ -164,6 +229,7 @@ public class DistMojo extends AbstractGettextMojo {
     }
 
     private class MsgFmtCommandlineFactory implements CommandlineFactory {
+
         public File getOutputFile(File input) {
             String locale = getLocale(input);
             return new File(outputDirectory, targetBundle.replace('.', File.separatorChar) + "_" + locale + ".class");
@@ -185,7 +251,7 @@ public class DistMojo extends AbstractGettextMojo {
             }
 
             cl.createArg().setValue("-d");
-            cl.createArg().setFile(outputDirectory);
+            cl.createArg().setFile(TMP_DIR.toFile());
             cl.createArg().setValue("-r");
             cl.createArg().setValue(targetBundle);
             cl.createArg().setValue("-l");
@@ -200,6 +266,7 @@ public class DistMojo extends AbstractGettextMojo {
     }
 
     private class MsgCatCommandlineFactory implements CommandlineFactory {
+
         public File getOutputFile(File input) {
             String basepath = targetBundle.replace('.', File.separatorChar);
             String locale = input.getName().substring(0, input.getName().lastIndexOf('.'));
