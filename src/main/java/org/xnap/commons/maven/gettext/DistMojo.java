@@ -92,12 +92,8 @@ public class DistMojo extends AbstractGettextMojo {
     protected boolean asSource;
 
     public void execute() throws MojoExecutionException {
-        // create output directory if it doesn't exists
-        try {
-            FileUtils.deleteDirectory(outputDirectory);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final FileMover fileMover = new FileMover(getLog(), TMP_DIR.toFile(), targetBundle, outputDirectory);
+
         outputDirectory.mkdirs();
 
         CommandlineFactory cf;
@@ -139,58 +135,16 @@ public class DistMojo extends AbstractGettextMojo {
                 getLog().error("Could not execute " + cl.getExecutable() + ".", e);
             }
 
-            final String javaClassName = cf.getOutputFile(inputFile).getName().replace(".class", ".java");
-            final File bundleDir = Paths.get(TMP_DIR.toString(), "com", "signavio", "workflow", "i18n", javaClassName).toFile();
-            final Path outPath = Paths.get(outputDirectory.getAbsolutePath(), "com", "signavio", "workflow", "i18n");
-            try {
-
-                FileUtils.moveFileToDirectory(bundleDir, outPath.toFile(), outputDirectory.listFiles().length == 0);
-                //                FileUtils.
-
-            } catch (IOException e) {
-                throw new MojoExecutionException(
-                    "Unable to move dir '" + bundleDir + "' to '" + outputDirectory.toPath() + "'", e);
-            }
-
-            try {
-                FileUtils.cleanDirectory(TMP_DIR.toFile());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-
- /*       final String replace = targetBundle.replace('.', File.separatorChar);
-        Paths.get(outputDirectory.getAbsolutePath(), replace).toFile().mkdirs();
-                getLog().info(String.join("#", replace));
-
-        for (File dir : TMP_DIR.toFile().listFiles((FileFilter) DirectoryFileFilter.DIRECTORY)) {
-            getLog().info(dir.getAbsolutePath());
-
-            for (File file : dir.listFiles()) {
-                getLog().info(file.getAbsolutePath());
-                for (String f : file.list()) {
-                    getLog().info(f);
+            if (asSource) {
+                try {
+                    fileMover.moveTmpFilesToOutputDirectory(outputFile);
+                } catch (IOException e) {
+                    throw new MojoExecutionException(
+                        "Unable to move files to outputDirectory: " + outputDirectory, e);
                 }
             }
 
-            //            getLog().info(dir.listFiles() + "");
-            final File src = dir.listFiles()[0];
-            getLog().info(
-                "Moving dir " + src + " to " + outputDirectory.toPath());
-            try {
-//                Files.move(dir.toPath(), outputDirectory.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                getLog().info("source: " + src.getAbsolutePath());
-                FileUtils.moveToDirectory(src, outputDirectory, true);
-            } catch (IOException e) {
-                throw new MojoExecutionException(
-                    "Unable to move dir " + dir.toPath() + " to " + outputDirectory.toPath(), e);
-            }
-
-            //            dir.listFiles()[0]
-            //            final File target = new File(outputDirectory, dir.getAbsolutePath());
-            //            dir.renameTo(new File(outputDirectory, targetBundle));
-        }*/
+        }
 
         String basepath = targetBundle.replace('.', File.separatorChar);
         getLog().info("Creating resource bundle for source locale");
@@ -250,15 +204,18 @@ public class DistMojo extends AbstractGettextMojo {
                 cl.createArg().setValue("--java");
             }
 
-            cl.createArg().setValue("-d");
-            cl.createArg().setFile(TMP_DIR.toFile());
+            if (asSource) {
+                cl.createArg().setValue("--source");
+                cl.createArg().setValue("-d");
+                cl.createArg().setFile(TMP_DIR.toFile());
+            } else {
+                cl.createArg().setValue("-d");
+                cl.createArg().setFile(outputDirectory);
+            }
             cl.createArg().setValue("-r");
             cl.createArg().setValue(targetBundle);
             cl.createArg().setValue("-l");
             cl.createArg().setValue(getLocale(file));
-            if (asSource) {
-                cl.createArg().setValue("--source");
-            }
             cl.createArg().setFile(file);
             getLog().warn(cl.toString());
             return cl;
