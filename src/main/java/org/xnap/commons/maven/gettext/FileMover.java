@@ -2,7 +2,6 @@ package org.xnap.commons.maven.gettext;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.logging.Log;
@@ -21,24 +20,37 @@ public class FileMover {
         this.outputDirectory = outputDirectory;
     }
 
-    public void moveTmpFilesToOutputDirectory(File outputFile) throws IOException {
-        final String bundlePackage = targetBundle.substring(0, targetBundle.lastIndexOf("."));
-        log.debug("bundlePackage: " + bundlePackage);
-        final File bundleDir = Paths.get(tmpDir.getAbsolutePath(), bundlePackage.split("\\.")).toFile();
-        log.debug("bundleDir: " + bundleDir);
-        final File bundleFile = new File(bundleDir, getTargetFilename(outputFile));
-        log.debug("bundleFile: " + bundleFile);
-        final Path outDir = Paths.get(outputDirectory.getAbsolutePath(), bundlePackage.split("\\."));
-        final File destFile = new File(outDir.toFile(), getTargetFilename(outputFile));
-        log.debug("destFile: " + destFile);
+    public void moveTmpFileToOutputDirectory(File outputFile) throws IOException {
+        final String bundleRelativeDir = getBundleRelativeDirectory(targetBundle);
+        final String bundleFilename = getTargetFilename(outputFile);
 
-        log.info("Moving file '" + bundleFile + "' to '" + destFile + "'");
-        FileUtils.delete(destFile);
-        FileUtils.moveFile(bundleFile, destFile, StandardCopyOption.REPLACE_EXISTING);
+        final File srcDir = new File(tmpDir, bundleRelativeDir);
+        final File srcFile = getSrcFile(srcDir, bundleFilename);
+
+        final File destDir = new File(outputDirectory, bundleRelativeDir);
+        final File destFile = getDestFile(destDir, bundleFilename);
+
+        log.info("Moving file '" + srcFile + "' to '" + destFile + "'");
+        FileUtils.deleteQuietly(destFile);
+        FileUtils.moveFile(srcFile, destFile);
         FileUtils.cleanDirectory(tmpDir);
     }
 
-    private static String getTargetFilename(File outputFile) {
+    private String getBundleRelativeDirectory(String bundleName) {
+        final String bundlePackage = bundleName.substring(0, bundleName.lastIndexOf("."));
+        log.debug("bundlePackage: " + bundlePackage);
+        return bundlePackage.replace('.', File.separatorChar);
+    }
+
+    private File getSrcFile(File bundleDir, String filename) {
+        return new File(bundleDir, filename);
+    }
+
+    private File getDestFile(File destDir, String filename) {
+        return new File(destDir, filename);
+    }
+
+    private String getTargetFilename(File outputFile) {
         return outputFile.getName().replace(".class", ".java");
     }
 }

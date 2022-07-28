@@ -18,9 +18,7 @@ package org.xnap.commons.maven.gettext;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.LocaleUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.*;
@@ -36,14 +34,11 @@ import org.codehaus.plexus.util.cli.*;
 @Mojo(name = "dist", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class DistMojo extends AbstractGettextMojo {
 
-    private static Path TMP_DIR;
+    private static File tmpDir;
 
     public DistMojo() {
-        try {
-            TMP_DIR = Files.createTempDirectory("gettext-maven");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        tmpDir = new File(System.getProperty("java.io.tmpdir"), "gettext-maven-plugin");
+        tmpDir.mkdirs();
     }
 
     /**
@@ -92,7 +87,7 @@ public class DistMojo extends AbstractGettextMojo {
     protected boolean asSource;
 
     public void execute() throws MojoExecutionException {
-        final FileMover fileMover = new FileMover(getLog(), TMP_DIR.toFile(), targetBundle, outputDirectory);
+        final FileMover fileMover = new FileMover(getLog(), tmpDir, targetBundle, outputDirectory);
 
         outputDirectory.mkdirs();
 
@@ -137,7 +132,7 @@ public class DistMojo extends AbstractGettextMojo {
 
             if (asSource) {
                 try {
-                    fileMover.moveTmpFilesToOutputDirectory(outputFile);
+                    fileMover.moveTmpFileToOutputDirectory(outputFile);
                 } catch (IOException e) {
                     throw new MojoExecutionException(
                         "Unable to move files to outputDirectory: " + outputDirectory, e);
@@ -207,7 +202,7 @@ public class DistMojo extends AbstractGettextMojo {
             if (asSource) {
                 cl.createArg().setValue("--source");
                 cl.createArg().setValue("-d");
-                cl.createArg().setFile(TMP_DIR.toFile());
+                cl.createArg().setFile(tmpDir);
             } else {
                 cl.createArg().setValue("-d");
                 cl.createArg().setFile(outputDirectory);
