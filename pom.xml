@@ -59,6 +59,19 @@
     <url>https://github.com/${gitUrl}</url>
   </scm>
 
+		<distributionManagement>
+				<repository>
+						<id>central</id>
+						<name>signavio-releases</name>
+						<url>https://signavio.jfrog.io/artifactory/plugins-release-local</url>
+				</repository>
+				<snapshotRepository>
+						<id>snapshots</id>
+						<name>signavio-snapshots</name>
+						<url>https://signavio.jfrog.io/artifactory/plugins-snapshot-local</url>
+				</snapshotRepository>
+		</distributionManagement>
+
   <repositories>
     <repository>
       <id>signavio-releases</id>
