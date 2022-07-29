@@ -7,7 +7,9 @@
   <name>Maven Gettext Plugin</name>
   <description>Generate messages templates and deploy messages bundles</description>
   <properties>
-    <gitUrl>signavio/gettext-maven-plugin</gitUrl>
+		  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		  <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		  <gitUrl>signavio/gettext-maven-plugin</gitUrl>
   </properties>
   <licenses>
     <license>
@@ -102,6 +104,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>3.8.5</version>
+		    <scope>provided</scope>
     </dependency>
     <!-- dependencies to annotations -->
     <dependency>
